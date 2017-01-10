@@ -9,8 +9,6 @@ session_start();
 <head>
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="simple-slider.js"></script>
-<link href="simple-slider.css" rel="stylesheet" type="text/css" />
 
 <script type="text/javascript">
 function openNav() {
@@ -23,21 +21,35 @@ function closeNav() {
     document.getElementById("main").style.marginLeft= "0";
 }
 
-$('#volume-slider').on('slider:changed', function (event, data) {
-  // The value as a ratio of the slider (between 0 and 1)
-  alert(data.ratio);
-});
-
-
-  $(document).ready(function(){
+$(document).ready(function(){
   	$('video').prop('volume', 0.5);
 	$('video')[0].play();
     $('video').on('ended',function(){
-      $('.videos').animate({scrollTop: '+=725px'}, 800);
+      $('.videos').animate({scrollTop: '+=720px'}, 800);
 	  $(this).next().trigger('play');
 	  
     });
   });
+  
+(function () {
+	function init() {
+		var volumeslider = document.querySelector('#volume');
+		volumeslider.addEventListener('input', changeVolume);
+		changeVolume();
+	};
+
+	function changeVolume() {
+		var video = document.getElementsByClassName("video");
+		$(video).each(function(i, obj) {
+		var volumeslider = document.getElementById('volume').value;
+		$(obj).prop('volume', volumeslider/100);
+		});
+		return false;
+	};
+	document.addEventListener("DOMContentLoaded", function () {
+		init();
+	});
+}());
 
 </script>
 <STYLE type="text/css">
@@ -52,9 +64,9 @@ $('#volume-slider').on('slider:changed', function (event, data) {
    
    .background {
    background-color: rgba(0, 0, 0, 0.8);
-   width: 2400px;
-   height: 2400px;
-   padding: 7% 18%;
+   width: 86,5%;
+   height: 1100px;
+   padding: 7% 7%;
    margin-left: -25px; 
    margin-top: -14px;
    color: white;
@@ -62,11 +74,20 @@ $('#volume-slider').on('slider:changed', function (event, data) {
    
    .videos {
    background-color: rgba(255, 255, 255, 0.1);
-   max-width: 1300px;
-   max-height: 720px;
+   width: 1300px;
+   height: 720px;
+   margin: auto;
    overflow-x: hidden;
    overflow-y: auto;
    }
+  
+	.video {
+	margin-top: 0px;
+	padding-top: 0px;
+	margin-bottom: -5px;
+	padding-bottom: 0px;
+	
+	}
   
  </STYLE>
  </head>
@@ -100,7 +121,11 @@ $('#volume-slider').on('slider:changed', function (event, data) {
 </div>
 </div>
 <div class="background">
-<div style="display: none; position: fixed; top: 50%; left: 30px; z-index:30;"><input id="volume" type="text" data-slider="true" value="0.2"></div>
+<div style=position: fixed; top: 50%; left: 30px; z-index:30;">
+<form oninput="x.value=parseInt(volume.value)">
+<label for="volume">Global Volume:</label><br>
+<input id="volume" type="range" min="0" max="100" value="">
+<output id="volumevalue" name="x" for="volume">50</output></div>
 <div class="videos">
 <?php
 function fetch_memes($file_array) {
@@ -120,7 +145,7 @@ foreach ($file_array as $key => $file)
 				if($key >= $starthere && $key < $stophere && preg_match('/.+\.(webm|mp4)$/', $file) && !preg_match('/.+\.php/', $file))
 				{
 					$videoname = explode("/", $file);
-					echo "<video id='video' title='".$videoname[1]."' style='width:1280px; max-height: 720px;' controls><source src='".$file."' type='video/mp4'>Your browser does not support the video tag.</video>";
+					echo "<video class='video' title='".$videoname[1]."' style='width:1280px; height: 720px;' controls><source src='".$file."' type='video/mp4'>Your browser does not support the video tag.</video>";
 				}
 				
 			}
@@ -128,7 +153,7 @@ foreach ($file_array as $key => $file)
 		echo "</div><div style='display:none;'>Starthere: ".$starthere."// Stophere: ".$stophere."// Memes: ".$memes." // Cycle:".$_SESSION['reload']." / ".$cycles."<div>";
 }
 
-$file_array = glob('keion/*.{webm,mp4}', GLOB_BRACE);
+$file_array = glob('*/*.{webm,mp4}', GLOB_BRACE);
 //$file_array = array_merge($file_array, glob('*.webm'));
 shuffle($file_array);
 fetch_memes($file_array);
